@@ -1,5 +1,5 @@
-from LogStrategy import LogStrategy
-from Singleton import Singleton
+from log_strategy import LogStrategy
+from singleton import Singleton
 import threading
 
 class Logger(Singleton):

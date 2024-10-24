@@ -1,5 +1,5 @@
-from Logger import Logger
-from LogStrategy import ConsoleLogStrategy, FileLogStrategy, UpperCaseFileLogStrategy
+from logger import Logger
+from log_strategy import ConsoleLogStrategy, FileLogStrategy, UpperCaseFileLogStrategy
 
 if __name__ == "__main__":
     # Пример логирования в консоль
