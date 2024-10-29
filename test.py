@@ -1,65 +1,60 @@
-from logger import Logger
-from log_strategy import ConsoleLogStrategy, FileLogStrategy, UpperCaseFileLogStrategy
 import unittest
-import threading
-import tempfile
+from unittest.mock import mock_open, patch
 import os
+from writers import ConsoleLogWriter, FileLogWriter, UpperCaseFileLogWriter
 
 
-class TestLoggerThreadSafe(unittest.TestCase):
+class TestConsoleLogWriter(unittest.TestCase):
 
-    def setUp(self):
-        """Подготовка перед каждым тестом."""
-        self.file_path = tempfile.TemporaryDirectory()  # Используем временную директорию
+    @patch('builtins.print')
+    def test_write_logs_to_console(self, mock_print):
+        writer = ConsoleLogWriter()
+        writer.write("Test message")
+        mock_print.assert_called_once_with("Test message")
 
-    def tearDown(self):
-        """Очистка временных файлов после каждого теста."""
-        self.file_path.cleanup()  # Удаляем временные файлы
 
-    def run_multithreaded_logging(self, logger, expected_message, filename=None):
-        """Метод для многопоточного логгирования и проверки результата."""
+class TestFileLogWriter(unittest.TestCase):
 
-        def log_messages():
-            for i in range(10):
-                logger.log("INFO", f"Application started successfully {i}")
+    @patch('builtins.open', new_callable=mock_open)
+    def test_write_logs_to_file(self, mock_file):
+        writer = FileLogWriter('test_log_path')
+        writer.write("Test message")
 
-        threads = [threading.Thread(target=log_messages) for _ in range(5)]
+        # Создание пути для проверки
+        expected_path = os.path.join('test_log_path', writer.get_filename())
 
-        for thread in threads:
-            thread.start()
+        # Проверка, что файл открывается с правильными параметрами
+        mock_file.assert_called_once_with(expected_path, 'a')
 
-        for thread in threads:
-            thread.join()
+        # Проверка, что сообщение записывается в файл
+        mock_file().write.assert_called_once_with("Test message\n")
 
-        if filename and os.path.exists(filename):
-            with open(filename, 'r') as f:
-                content = f.read()
-            self.assertIn(expected_message, content)
-        elif filename:
-            self.fail(f"File {filename} was not created.")
+    def test_set_file_path(self):
+        writer = FileLogWriter('initial_path')
+        writer.set_file_path('new_path')
+        self.assertEqual(writer.file_path, 'new_path')
 
-    def test_console_log_multithreaded(self):
-        """Тест многопоточного логгирования в консоль."""
-        logger = Logger(ConsoleLogStrategy())
-        self.run_multithreaded_logging(logger, f"[INFO] Application started successfully 0")
 
-    def test_file_log_multithreaded(self):
-        """Тест многопоточного логгирования в файл."""
-        logger = Logger(FileLogStrategy(self.file_path.name))
-        timestamp = FileLogStrategy(self.file_path.name).get_timestamp()
-        filename = FileLogStrategy(self.file_path.name).get_filename()
-        expected_message = f"{timestamp} [INFO] Application started successfully 0"
+class TestUpperCaseFileLogWriter(unittest.TestCase):
 
-        self.run_multithreaded_logging(logger, expected_message, os.path.join(self.file_path.name, filename))
+    @patch('builtins.open', new_callable=mock_open)
+    def test_write_logs_in_upper_case(self, mock_file):
+        writer = UpperCaseFileLogWriter('test_log_path')
+        writer.write("Test message")
 
-    def test_uppercase_file_log_multithreaded(self):
-        """Тест многопоточного логгирования в файл с верхним регистром."""
-        logger = Logger(UpperCaseFileLogStrategy(self.file_path.name))
-        timestamp = FileLogStrategy(self.file_path.name).get_timestamp()
-        filename = FileLogStrategy(self.file_path.name).get_filename()
-        expected_message = f"{timestamp} [INFO] APPLICATION STARTED SUCCESSFULLY 0"
+        # Создание пути для проверки
+        expected_path = os.path.join('test_log_path', writer.get_filename())
 
-        self.run_multithreaded_logging(logger, expected_message, os.path.join(self.file_path.name, filename))
+        # Проверка, что файл открывается с правильными параметрами
+        mock_file.assert_called_once_with(expected_path, 'a')
+
+        # Проверка, что сообщение записывается в файл в верхнем регистре
+        mock_file().write.assert_called_once_with("TEST MESSAGE\n")
+
+    def test_set_file_path(self):
+        writer = UpperCaseFileLogWriter('initial_path')
+        writer.set_file_path('new_path')
+        self.assertEqual(writer.file_path, 'new_path')
 
 
 if __name__ == '__main__':
