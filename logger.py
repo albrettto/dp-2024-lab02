@@ -15,7 +15,7 @@ class Logger(Singleton, ILogger):
         """Инициализирует логгер с заданной стратегией записи."""
         self.writer = writer
 
-    def set_log_strategy(self, writer: Writer):
+    def set_writer(self, writer: Writer):
         """Устанавливает новую стратегию записи для логгера."""
         self.writer = writer
 
@@ -25,6 +25,6 @@ class Logger(Singleton, ILogger):
 
     def log(self, level: LogLevel, message: str):
         """Логирует сообщение с указанным уровнем, используя текущую стратегию записи."""
-        formatted_message = self._format_message(level.name, message)
+        formatted_message = self._format_message(level.value, message)
         with self._lock:
             self.writer.write(formatted_message)

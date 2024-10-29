@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     # Пример логирования в файл
     file_log_strategy = FileLogWriter(file_path)
-    logger.set_log_strategy(file_log_strategy)
+    logger.set_writer(file_log_strategy)
     logger.log(LogLevel.INFO, "Application started successfully")
     # Смена пути файла для этого логгера
     file_log_strategy.set_file_path(file_path + "\\Logs")
@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # Пример логирования в файл в верхнем регистре
     upper_case_file_log_writer = UpperCaseFileLogWriter(file_path)
-    logger.set_log_strategy(upper_case_file_log_writer)
+    logger.set_writer(upper_case_file_log_writer)
     logger.log(LogLevel.INFO, "Application started successfully")
     # Смена пути файла для этого логгера
     upper_case_file_log_writer.set_file_path(file_path + "\\Logs")

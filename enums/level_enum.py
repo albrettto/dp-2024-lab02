@@ -13,8 +13,8 @@ class LogLevel(Enum):
         FATAL (5): Критические ошибки.
     """
 
-    TRACE = 1
-    INFO = 2
-    WARN = 3
-    ERROR = 4
-    FATAL = 5
+    TRACE = "TRACE"
+    INFO = "INFO"
+    WARN = "WARN"
+    ERROR = "ERROR"
+    FATAL = "FATAL"

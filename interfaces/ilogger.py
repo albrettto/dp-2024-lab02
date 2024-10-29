@@ -6,7 +6,7 @@ class ILogger(ABC):
     """Интерфейс для логгера, определяющий основные методы для настройки и записи логов."""
 
     @abstractmethod
-    def set_log_strategy(self, writer: Writer):
+    def set_writer(self, writer: Writer):
         """Устанавливает стратегию записи логов."""
         pass
 
